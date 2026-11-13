@@ -1,5 +1,9 @@
 # AgentGuard
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/AnantPrabhudesai01/agentguard)](https://github.com/AnantPrabhudesai01/agentguard/releases)
+[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%99%A5-ff69b4.svg)](https://github.com/sponsors/AnantPrabhudesai01)
+
 Static security audit for AI agents and MCP servers. Zero dependencies, runs offline, Python 3.10+.
 
 Agents are no longer chatbots. They read files, run shell commands, query databases, call internal APIs, and load third-party MCP servers. Every tool argument is an input path into your infrastructure. AgentGuard checks the places where those paths become vulnerabilities.

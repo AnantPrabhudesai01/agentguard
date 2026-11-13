@@ -92,16 +92,22 @@ if (-not (Test-Path ".git")) {
     git commit -m "AgentGuard v0.1.0"
     if ($LASTEXITCODE -ne 0) { Fail "git commit failed" }
 }
-gh repo view $repoName 2>$null | Out-Null
-if ($LASTEXITCODE -ne 0) {
-    gh repo create $repoName --public --source=. --remote=origin --push
+git branch -M main
+$repoExists = $false
+try {
+    $null = & gh repo view $repoName 2>&1
+    if ($LASTEXITCODE -eq 0) { $repoExists = $true }
+} catch {
+    $repoExists = $false
+}
+
+if (-not $repoExists) {
+    & gh repo create $repoName --public --source=. --remote=origin --push
     if ($LASTEXITCODE -ne 0) { Fail "gh repo create failed" }
 } else {
-    $branch = git branch --show-current
-    if (-not $branch) { $branch = "main" }
-    git push -u origin $branch
+    & git push -u origin main
     if ($LASTEXITCODE -ne 0) { Fail "git push failed" }
 }
-gh repo edit --add-topic mcp,security,ai-agents,static-analysis,appsec
-gh release create v0.1.0 --title "v0.1.0" --notes "First public release. Static security audit for AI agents and MCP servers."
+& gh repo edit --add-topic mcp,security,ai-agents,static-analysis,appsec
+& gh release create v0.1.0 --title "v0.1.0" --notes "First public release. Static security audit for AI agents and MCP servers."
 Write-Host "`nPublished. Next: replace the GitHub links in site/index.html with the real repo URL, enable Pages, then post per LAUNCH.md." -ForegroundColor Green

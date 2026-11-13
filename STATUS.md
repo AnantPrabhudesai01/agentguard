@@ -1,8 +1,17 @@
-# AgentGuard status — 2026-11-07
+# AgentGuard status — 2026-11-13
 
 ## Revenue
 
-**$0.00.** No customer, no invoice, no payment. The ledger stays at zero until money actually arrives.
+**$0.00.** No customer, no invoice, no payment yet. The ledger stays at zero until real client money arrives.
+
+## Live Public Presence
+
+- **Public Repository:** [https://github.com/AnantPrabhudesai01/agentguard](https://github.com/AnantPrabhudesai01/agentguard)
+- **First Release:** [v0.1.0](https://github.com/AnantPrabhudesai01/agentguard/releases/tag/v0.1.0)
+- **Topics:** `mcp`, `security`, `ai-agents`, `static-analysis`, `appsec`
+- **Contact & Inquiries:** Issues and Discussions enabled on GitHub
+- **Payee Channel:** Private UPI integration active (ICICI Bank VPA + QR Code)
+- **Invoicing Engine:** `private/generate_invoice.py` ready to deliver instant client invoices with embedded QR code
 
 ## Built and verified today
 
