@@ -1,0 +1,21 @@
+# Secrets and private config
+.env
+.env.*
+private/
+*.key
+*.pem
+invoice_config.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Reports generated locally
+reports/*.json
+.tmp/
+
+# OS
+Thumbs.db
+.DS_Store

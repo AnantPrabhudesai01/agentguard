@@ -1,0 +1,33 @@
+name: AgentGuard
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Replace with your-org/agentguard@v0.1.0 after publishing.
+      - name: AgentGuard audit
+        uses: your-org/agentguard@v0.1.0
+        with:
+          path: .
+          fail-on: high
+          output: agentguard-report.md
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agentguard-report
+          path: agentguard-report.md

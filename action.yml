@@ -1,0 +1,32 @@
+name: AgentGuard
+description: Static security audit for AI agents and MCP servers
+author: AgentGuard
+branding:
+  icon: shield
+  color: purple
+
+inputs:
+  path:
+    description: Path to scan
+    required: false
+    default: "."
+  fail-on:
+    description: "Fail at or above this severity: critical, high, medium, low, none"
+    required: false
+    default: "high"
+  output:
+    description: Report file path
+    required: false
+    default: "agentguard-report.md"
+
+runs:
+  using: composite
+  steps:
+    - name: Run AgentGuard
+      shell: bash
+      run: |
+        python "${{ github.action_path }}/audit.py" \
+          "${{ inputs.path }}" \
+          --format md \
+          --output "${{ inputs.output }}" \
+          --fail-on "${{ inputs.fail-on }}"

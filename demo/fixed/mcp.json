@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "support": {
+      "command": "node",
+      "args": ["./dist/server.js"],
+      "env": {
+        "SUPPORT_CONFIG": "./data"
+      }
+    }
+  }
+}

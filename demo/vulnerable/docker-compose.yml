@@ -1,0 +1,9 @@
+services:
+  agent:
+    image: demo/support-agent:latest
+    privileged: true
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      API_KEY: "NOT_A_REAL_KEY_1234567890"

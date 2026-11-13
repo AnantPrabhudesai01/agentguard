@@ -1,0 +1,7 @@
+services:
+  agent:
+    image: demo/support-agent:1.4.2
+    read_only: true
+    network_mode: bridge
+    volumes:
+      - ./data:/app/data:ro

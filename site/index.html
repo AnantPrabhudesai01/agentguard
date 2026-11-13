@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgentGuard — security audits for AI agents and MCP servers</title>
+<meta name="description" content="Static security audit for AI agents and MCP servers. Find unvalidated tool boundaries, secrets, prompt injection, SSRF, and container escape paths before an attacker does.">
+<style>
+  :root {
+    --bg: #0b0d12;
+    --panel: #12151d;
+    --panel-2: #171b25;
+    --line: #252b39;
+    --text: #e7eaf2;
+    --muted: #98a0b3;
+    --accent: #7c9cff;
+    --accent-2: #55e0b0;
+    --danger: #ff6b81;
+    --warn: #ffc76b;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: radial-gradient(900px 500px at 20% -10%, #1a2440 0%, transparent 60%),
+                radial-gradient(700px 400px at 90% 0%, #123029 0%, transparent 55%),
+                var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+  header { padding: 22px 0; border-bottom: 1px solid var(--line); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -0.02em; }
+  .mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: grid; place-items: center; color: #0b0d12; font-size: 15px; }
+  nav { display: flex; gap: 22px; font-size: 14px; color: var(--muted); }
+  nav a { color: var(--muted); }
+  .hero { padding: 84px 0 56px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-2); border: 1px solid #23443a; background: #11221d; padding: 6px 12px; border-radius: 999px; }
+  h1 { font-size: clamp(38px, 6vw, 66px); line-height: 1.04; letter-spacing: -0.04em; margin: 22px 0 20px; max-width: 900px; }
+  h1 span { color: var(--accent); }
+  .sub { font-size: 19px; color: var(--muted); max-width: 720px; margin: 0 0 30px; }
+  .cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 15px; border: 1px solid transparent; cursor: pointer; }
+  .btn-primary { background: var(--accent); color: #0b0d12; }
+  .btn-primary:hover { background: #96afff; text-decoration: none; }
+  .btn-ghost { border-color: var(--line); color: var(--text); background: var(--panel); }
+  .btn-ghost:hover { border-color: #3a4358; text-decoration: none; }
+  .hero-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 36px; align-items: start; margin-top: 44px; }
+  .terminal { background: #090b10; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: 0 22px 70px rgba(0,0,0,0.45); }
+  .term-bar { display: flex; align-items: center; gap: 7px; padding: 11px 14px; border-bottom: 1px solid var(--line); background: #0d1017; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #2c3342; }
+  .term-body { padding: 18px; font-family: var(--mono); font-size: 12.5px; line-height: 1.75; overflow-x: auto; }
+  .p { color: var(--accent-2); }
+  .c { color: #7f8a9f; }
+  .r { color: var(--danger); }
+  .w { color: var(--warn); }
+  .g { color: #7f8a9f; }
+  .ok { color: var(--accent-2); }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 22px; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .stat b { display: block; font-size: 24px; letter-spacing: -0.03em; }
+  .stat span { color: var(--muted); font-size: 12px; }
+  section { padding: 62px 0; border-top: 1px solid var(--line); }
+  h2 { font-size: clamp(26px, 3.4vw, 38px); letter-spacing: -0.03em; margin: 0 0 10px; }
+  .section-sub { color: var(--muted); max-width: 680px; margin: 0 0 32px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+  .card h3 { margin: 0 0 8px; font-size: 16px; }
+  .card p { margin: 0; color: var(--muted); font-size: 14px; }
+  .card .tag { display: inline-block; font-family: var(--mono); font-size: 11px; color: var(--accent-2); background: #11221d; border: 1px solid #23443a; padding: 2px 8px; border-radius: 6px; margin-bottom: 12px; }
+  .pricing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: stretch; }
+  .price { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; }
+  .price.featured { border-color: #3d5bd6; background: linear-gradient(180deg, #151c31, var(--panel)); box-shadow: 0 0 0 1px #3d5bd6 inset; }
+  .price .amount { font-size: 42px; letter-spacing: -0.04em; margin: 8px 0 2px; }
+  .price .amount small { font-size: 14px; color: var(--muted); letter-spacing: 0; }
+  .price ul { padding-left: 18px; color: var(--muted); font-size: 14px; margin: 16px 0 22px; }
+  .price li { margin: 6px 0; }
+  .price .btn { margin-top: auto; justify-content: center; }
+  .badge { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-2); }
+  .faq { display: grid; gap: 10px; }
+  details { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  summary { cursor: pointer; font-weight: 600; }
+  details p { color: var(--muted); margin: 10px 0 0; font-size: 14px; }
+  footer { padding: 34px 0 50px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); }
+  .footer-row { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--accent-2); color: #04251c; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; opacity: 0; transition: 0.2s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  @media (max-width: 860px) {
+    .hero-grid, .grid, .pricing { grid-template-columns: 1fr; }
+    nav { display: none; }
+    .stats { grid-template-columns: 1fr; }
+    .hero { padding-top: 56px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="logo"><span class="mark">◆</span> AgentGuard</div>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="#checks">Checks</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="btn btn-ghost" href="https://github.com/AnantPrabhudesai01">GitHub</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <span class="eyebrow">● Static analysis for the agent layer</span>
+    <h1>Your agent has shell access.<br><span>Audit the boundary.</span></h1>
+    <p class="sub">AgentGuard finds the vulnerabilities generic SAST misses: unvalidated tool arguments, secrets in MCP configs, prompt injection in tool metadata, SSRF, unsafe containers, and missing tenant isolation.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="#pricing">Book a $99 launch audit</a>
+      <a class="btn btn-ghost" href="https://github.com/AnantPrabhudesai01">Get the free scanner</a>
+      <a class="btn btn-ghost" href="sample-report.html">See a sample report</a>
+    </div>
+
+    <div class="hero-grid">
+      <div class="terminal">
+        <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="term-body">
+<span class="p">$</span> python audit.py demo/vulnerable<br>
+<span class="c"># AgentGuard Security Audit</span><br>
+<span class="c"># Files scanned: 5</span><br>
+<span class="c"># Risk score: </span><span class="r">97/100 (Critical)</span><br>
+<br>
+<span class="r">2 critical</span> &nbsp; <span class="w">12 high</span> &nbsp; 4 medium &nbsp; 5 low<br>
+<br>
+<span class="r">[CRITICAL]</span> eval(expression) &nbsp;<span class="g">mcp_server.py:22</span><br>
+<span class="r">[CRITICAL]</span> SQL built with an f-string &nbsp;<span class="g">mcp_server.py:41</span><br>
+<span class="w">[HIGH]</span> subprocess(shell=True) &nbsp;<span class="g">mcp_server.py:28</span><br>
+<span class="w">[HIGH]</span> path from tool input &nbsp;<span class="g">mcp_server.py:51</span><br>
+<span class="w">[HIGH]</span> secret in mcp.json &nbsp;<span class="g">mcp.json:3</span><br>
+<span class="w">[HIGH]</span> privileged container &nbsp;<span class="g">docker-compose.yml:4</span><br>
+<br>
+<span class="p">$</span> python audit.py demo/fixed<br>
+<span class="ok">0 findings. Risk score: 0/100 (Clean).</span>
+        </div>
+      </div>
+      <div>
+        <div class="stats">
+          <div class="stat"><b>23 → 0</b><span>findings after remediation</span></div>
+          <div class="stat"><b>27/27</b><span>tests passing</span></div>
+          <div class="stat"><b>0</b><span>third-party dependencies</span></div>
+        </div>
+        <p class="sub" style="font-size:14px;margin-top:18px">Every finding includes the file, line, evidence, and a concrete fix. The scanner runs offline. Your code never leaves your machine.</p>
+      </div>
+    </div>
+  </div>
+
+  <section id="how">
+    <div class="wrap">
+      <h2>Findings you can act on, not a wall of noise.</h2>
+      <p class="section-sub">The free scanner gives you the pattern-level view. The paid audit adds a human review of the architecture, permissions, and business logic that static rules cannot judge.</p>
+      <div class="grid">
+        <div class="card"><span class="tag">01 / scan</span><h3>Static pass</h3><p>Python, JS/TS, MCP configs, compose files, dependency manifests, and prompt files. Risk score, severities, evidence, fixes.</p></div>
+        <div class="card"><span class="tag">02 / review</span><h3>Manual audit</h3><p>Tool boundaries, tenant isolation, secret handling, reachability, and prompt/context separation, checked against a 90-item list.</p></div>
+        <div class="card"><span class="tag">03 / verify</span><h3>Before / after</h3><p>You get a prioritized report, a walkthrough, and one re-scan after fixes so the improvement is measured, not assumed.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="checks">
+    <div class="wrap">
+      <h2>Built for how agents actually break.</h2>
+      <p class="section-sub">Not another generic SAST wrapper.</p>
+      <div class="grid">
+        <div class="card"><h3>Tool boundary</h3><p>Unvalidated paths, shell interpolation, eval, SQL formatting, and SSRF from tool arguments.</p></div>
+        <div class="card"><h3>MCP configuration</h3><p>Unpinned packages, <code>npx -y</code>, dangerous flags, broad filesystem mounts, and secrets in env.</p></div>
+        <div class="card"><h3>Prompt injection</h3><p>Instruction-override phrases, hidden Unicode, HTML comments in tool metadata, and exfiltration phrasing.</p></div>
+        <div class="card"><h3>Containers</h3><p>Privileged mode, host networking, Docker socket mounts, and floating image tags.</p></div>
+        <div class="card"><h3>Secrets</h3><p>API keys, tokens, private keys, and credentials in source, config, compose, or logs.</p></div>
+        <div class="card"><h3>CI-ready</h3><p>Markdown or JSON reports, severity-based exit codes, inline suppression, and a composite GitHub Action.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="wrap">
+      <h2>Simple pricing. No retainer trap.</h2>
+      <p class="section-sub">The first five audits are discounted because the service is new and I want real case studies, not fake logos.</p>
+      <div class="pricing">
+        <div class="price featured">
+          <span class="badge">Launch · first 5</span>
+          <div class="amount">$99 <small>one codebase</small></div>
+          <ul>
+            <li>Static scan + manual review</li>
+            <li>Up to 50k lines of first-party code</li>
+            <li>Prioritized report with fixes</li>
+            <li>30-minute walkthrough</li>
+            <li>One re-scan after fixes</li>
+          </ul>
+          <a class="btn btn-primary" href="https://github.com/AnantPrabhudesai01">Claim a slot</a>
+        </div>
+        <div class="price">
+          <span class="badge">Standard</span>
+          <div class="amount">$249 <small>one codebase</small></div>
+          <ul>
+            <li>Everything in Launch</li>
+            <li>45-minute walkthrough</li>
+            <li>One re-scan after fixes</li>
+            <li>Written remediation guidance</li>
+          </ul>
+          <a class="btn btn-ghost" href="https://github.com/AnantPrabhudesai01">Request quote</a>
+        </div>
+        <div class="price">
+          <span class="badge">Retainer</span>
+          <div class="amount">$499 <small>per month</small></div>
+          <ul>
+            <li>Monthly scan + 2h review</li>
+            <li>Priority turnaround</li>
+            <li>New-rule coverage as the scanner grows</li>
+            <li>Cancel anytime</li>
+          </ul>
+          <a class="btn btn-ghost" href="https://github.com/AnantPrabhudesai01">Talk to me</a>
+        </div>
+      </div>
+      <p class="section-sub" style="margin-top:22px;font-size:13px">Payment by Stripe invoice, PayPal, or UPI through the human operator. No crypto wallet or seed phrase is ever requested. If the audit finds nothing actionable, you pay nothing.</p>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <h2>Questions worth asking.</h2>
+      <div class="faq">
+        <details><summary>Is this a penetration test?</summary><p>No. It is static analysis plus a manual code review. We do not attack live systems or prove exploitability. The report states this limitation instead of hiding it.</p></details>
+        <details><summary>Will my code leave my machine?</summary><p>The free scanner runs entirely offline. For a paid audit you share the repo or a zip; it is deleted after 30 days and never used to train models.</p></details>
+        <details><summary>What if you find nothing?</summary><p>You pay nothing. If we miss a critical issue that a reasonable review of the agreed scope should have caught, your next audit is free.</p></details>
+        <details><summary>Do you need production access?</summary><p>No. A repo, the MCP config, and a short description of the deployment are enough. Live testing is a separate engagement and requires written authorization.</p></details>
+        <details><summary>Can you fix the code too?</summary><p>Yes, as a separate scope. The audit includes concrete remediation guidance either way.</p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap footer-row">
+    <div>AgentGuard — static security audit for AI agents and MCP servers.</div>
+    <div>Inquiries: <a href="https://github.com/AnantPrabhudesai01/agentguard" target="_blank" rel="noopener">GitHub</a> · <a href="#pricing">Pricing</a></div>
+  </div>
+</footer>
+
+<div class="toast" id="toast">Copied</div>
+<script>
+  document.querySelectorAll('code').forEach(function (el) {
+    el.style.fontFamily = 'var(--mono)';
+    el.style.fontSize = '12.5px';
+    el.style.color = '#c7d2e8';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgentGuard Security Audit — D:\Anant\AiHuman\revenue\agentguard\demo\fixed</title>
+<style>
+  :root { --ink:#16202f; --muted:#5c6b82; --line:#dfe5ee; --bg:#f6f8fc; --panel:#ffffff; --accent:#3f5bd9; --critical:#d92d4b; --high:#d97706; --medium:#b58900; --low:#4b6cb7; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; line-height:1.6; }
+  .wrap { max-width:980px; margin:0 auto; padding:0 24px 60px; }
+  header { background:linear-gradient(135deg,#111a2e,#26365f); color:#fff; padding:34px 0 30px; margin-bottom:28px; }
+  header .wrap { padding-bottom:0; }
+  .brand { font-weight:800; letter-spacing:-0.02em; font-size:15px; color:#aebcff; text-transform:uppercase; }
+  h1 { font-size:30px; letter-spacing:-0.03em; margin:6px 0 4px; }
+  .target { font-family:ui-monospace,Consolas,monospace; font-size:12.5px; color:#c3cce7; word-break:break-all; }
+  .score-row { display:flex; gap:22px; align-items:center; margin-top:18px; flex-wrap:wrap; }
+  .score { width:92px; height:92px; border-radius:50%; display:grid; place-items:center; background:conic-gradient(#ff6b81 0%, #2c3d68 0); }
+  .score-inner { width:72px; height:72px; border-radius:50%; background:#111a2e; display:grid; place-items:center; text-align:center; }
+  .score-inner b { font-size:22px; display:block; line-height:1; }
+  .score-inner span { font-size:9px; text-transform:uppercase; letter-spacing:.08em; color:#aebcff; }
+  .score-copy b { display:block; font-size:18px; }
+  .score-copy span { color:#c3cce7; font-size:13px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px 24px; margin:16px 0; }
+  h2 { font-size:20px; letter-spacing:-0.02em; margin:0 0 12px; }
+  .summary p { margin:0; color:var(--muted); }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th,td { text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); }
+  th { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.06em; }
+  td:last-child, th:last-child { text-align:right; }
+  .sev { display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.08em; padding:3px 8px; border-radius:6px; margin-right:10px; vertical-align:2px; }
+  .sev.critical { background:#fdeaee; color:var(--critical); }
+  .sev.high { background:#fff2df; color:var(--high); }
+  .sev.medium { background:#fff8d9; color:#8a6d00; }
+  .sev.low { background:#eaf0ff; color:var(--low); }
+  .finding { border:1px solid var(--line); border-left:4px solid var(--line); border-radius:10px; padding:16px 18px; margin:12px 0; background:#fff; page-break-inside:avoid; }
+  .finding.critical { border-left-color:var(--critical); }
+  .finding.high { border-left-color:var(--high); }
+  .finding.medium { border-left-color:var(--medium); }
+  .finding.low { border-left-color:var(--low); }
+  .finding-head { display:flex; align-items:flex-start; }
+  .finding h3 { font-size:15.5px; margin:0; letter-spacing:-0.01em; }
+  .meta { display:flex; gap:14px; flex-wrap:wrap; color:var(--muted); font-size:12px; margin:8px 0 10px; }
+  .meta .rule { font-family:ui-monospace,Consolas,monospace; color:var(--accent); font-weight:600; }
+  .meta .loc { font-family:ui-monospace,Consolas,monospace; }
+  pre { background:#0f1726; color:#d7e2ff; border-radius:8px; padding:12px 14px; overflow-x:auto; font-size:12px; margin:0 0 10px; }
+  code { font-family:ui-monospace,Consolas,monospace; }
+  .fix { margin:0; font-size:13.5px; color:var(--muted); }
+  .fix strong { color:var(--ink); }
+  .scope { color:var(--muted); font-size:13px; }
+  footer { color:var(--muted); font-size:12px; text-align:center; padding-top:22px; }
+  .empty { color:var(--muted); }
+  @media print { body { background:#fff; } header { background:#111a2e !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; } .panel,.finding { break-inside:avoid; } }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="brand">AgentGuard · Security Audit</div>
+  <h1>Static security report</h1>
+  <div class="target">D:\Anant\AiHuman\revenue\agentguard\demo\fixed</div>
+  <div class="score-row">
+    <div class="score"><div class="score-inner"><b>0</b><span>/ 100</span></div></div>
+    <div class="score-copy"><b>Clean risk</b><span>5 files scanned · 2026-11-08 23:54</span></div>
+  </div>
+</div></header>
+<div class="wrap">
+  <div class="panel summary"><h2>Executive summary</h2><p>No findings in the static ruleset. This is not proof of security; a manual review is still required.</p></div>
+  <div class="panel"><h2>Findings by severity</h2>
+    <table><thead><tr><th>Severity</th><th>Count</th></tr></thead><tbody>
+      <tr><td>Critical</td><td>0</td></tr>
+      <tr><td>High</td><td>0</td></tr>
+      <tr><td>Medium</td><td>0</td></tr>
+      <tr><td>Low</td><td>0</td></tr>
+    </tbody></table>
+  </div>
+  <div class="panel"><h2>Findings</h2><p class="empty">No findings in the static ruleset. This is not proof of security; a manual review is still required.</p></div>
+  <div class="panel scope"><h2>Scope and limitations</h2>
+    <p>This is a static analysis pass over source and configuration files. It does not execute the agent, test live APIs, or prove exploitability. A manual review and dynamic testing are required for a complete audit.</p>
+  </div>
+  
+  <footer>Generated by AgentGuard · static analysis, not a penetration test · confidential to the client</footer>
+</div>
+</body>
+</html>
